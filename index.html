@@ -419,6 +419,9 @@
         const urlParams = new URLSearchParams(window.location.search);
         const isObsUrlMode = urlParams.get('obs') === '1';
 
+        // Capturar la clave de licencia desde la URL (ej: index.html?key=VZ-XXX-XXX) o localStorage
+        const licenseKey = urlParams.get('key') || localStorage.getItem('voztok_license_key') || '';
+
         const syncChannel = new BroadcastChannel('tikwheel_sync_channel');
 
         let winnerHistory = (() => {
@@ -472,6 +475,11 @@
             if (dot && txt) {
                 dot.className = 'inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
                 txt.innerHTML = 'Conectado a <strong class="text-emerald-400">Voztok Cloud</strong>';
+            }
+
+            // Enviar la clave de licencia al servidor para unirse a la sala privada exclusiva
+            if (licenseKey) {
+                socket.emit('validar-licencia', { key: licenseKey });
             }
         });
 
@@ -1370,7 +1378,12 @@
         }
 
         function getObsOverlayUrl() {
-            return `${window.location.origin}${window.location.pathname}?obs=1`;
+            // Incluir automáticamente la clave en la URL de OBS si está presente
+            const currentParams = new URLSearchParams(window.location.search);
+            const keyParam = currentParams.get('key');
+            let base = `${window.location.origin}${window.location.pathname}?obs=1`;
+            if (keyParam) base += `&key=${keyParam}`;
+            return base;
         }
 
         function copyOverlayUrl() {

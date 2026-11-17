@@ -152,11 +152,6 @@
                     <span class="hidden sm:inline" id="label-sound">Sonido ON</span>
                 </button>
 
-                <button id="btn-floating-win" onclick="openFloatingWindow()" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-tiktok-cyan to-blue-600 hover:opacity-95 text-black font-bold text-xs shadow-lg shadow-tiktok-cyan/20 transition flex items-center gap-2" title="Abrir panel completo en ventana flotante">
-                    <i class="fa-solid fa-up-right-from-square"></i>
-                    <span>Abrir Ventana Flotante</span>
-                </button>
-
                 <button onclick="enterObsMode('transparent')" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-tiktok-pink to-rose-600 hover:opacity-95 text-white font-semibold text-xs shadow-lg shadow-tiktok-pink/20 transition flex items-center gap-2">
                     <i class="fa-solid fa-tv"></i>
                     <span>Vista Previa OBS</span>
@@ -422,7 +417,6 @@
     <script>
         const BACKEND_SOCKET_URL = 'http://localhost:3000';
         const urlParams = new URLSearchParams(window.location.search);
-        const isPopupWindow = urlParams.get('popup') === '1';
         const isObsUrlMode = urlParams.get('obs') === '1';
 
         const syncChannel = new BroadcastChannel('tikwheel_sync_channel');
@@ -1097,7 +1091,6 @@
             }
         }
 
-        // Renderizado del listado de regalos autodetectados con filtrado por buscador
         function renderAllowedGiftsUI() {
             const container = document.getElementById('allowed-gifts-container');
             const searchInput = document.getElementById('gift-search-input');
@@ -1349,17 +1342,6 @@
             showToast('Presets restaurados');
         }
 
-        function openFloatingWindow() {
-            const popupUrl = `${window.location.origin}${window.location.pathname}?popup=1`;
-            const width = 1280;
-            const height = 850;
-            const left = (window.screen.width - width) / 2;
-            const top = (window.screen.height - height) / 2;
-            const win = window.open(popupUrl, 'TikWheelFloatingStage', `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`);
-            if (win) showToast('Ventana flotante completa abierta');
-            else showToast('Habilita las ventanas emergentes en tu navegador');
-        }
-
         function enterObsMode(type = 'transparent') {
             document.body.classList.add('obs-mode');
             const bar = document.getElementById('obs-exit-bar');
@@ -1416,15 +1398,7 @@
             renderWinnerHistoryUI();
             resizeCanvas();
 
-            if (isPopupWindow) {
-                const badge = document.getElementById('window-mode-badge');
-                if (badge) badge.textContent = 'Ventana Flotante';
-                const btnFloat = document.getElementById('btn-floating-win');
-                if (btnFloat) {
-                    btnFloat.innerHTML = '<i class="fa-solid fa-xmark"></i><span>Cerrar Ventana</span>';
-                    btnFloat.onclick = () => window.close();
-                }
-            } else if (isObsUrlMode) {
+            if (isObsUrlMode) {
                 enterObsMode('transparent');
                 const bar = document.getElementById('obs-exit-bar');
                 if(bar) bar.style.display = 'none';
